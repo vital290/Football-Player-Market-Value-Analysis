@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Football Player Market Value Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Football Player Market Value Prediction</h1>
+        
+        <form id="predictionForm" method="post" action="/predict" autocomplete="off">
+            <div class="input-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" placeholder="Age (16 to 50)">
+                <small>Any value between 16 to 50</small>
+            </div>
+            <!-- Repeat for other input fields -->
+            <div class="input-group">
+                <label for="overall">Overall:</label>
+                <input type="number" id="overall" name="overall" placeholder="Overall (0 to 100)">
+                <small>Any value between 0 to 100</small>
+            </div>
+            <div class="input-group">
+                <label for="potential">Potential:</label>
+                <input type="number" id="potential" name="potential" placeholder="Potential (0 to 100)">
+                <small>Any value between 0 to 100</small>
+            </div>
+            <div class="input-group">
+                <label for="international_reputation">International Reputation:</label>
+                <input type="number" id="international_reputation" name="international_reputation" placeholder="International Reputation (1 to 5)">
+                <small>Any value between 1 to 5 where 1 is low and 5 is high international reputation</small>
+            </div>
+            <div class="input-group">
+                <label for="release_clause">Release Clause:</label>
+                <input type="number" id="release_clause" name="release_clause" placeholder="Release Clause Numeric (0 to 1,000,000,000)">
+                <small>Any value between 0 to 1,000,000,000</small>
+            </div>
+            <div class="input-group">
+                <label for="wage">Wage:</label>
+                <input type="number" id="wage" name="wage" placeholder="Wage Numeric (100 to 1,000,000)">
+                <small>Any value between 100 to 1,000,000</small>
+            </div>
+
+            <button type="submit" id="predictButton">Predict Market Value</button>
+        </form>
+        <div id="predictionResult"></div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <script>
+        window.addEventListener('load', function() {
+            document.getElementById('predictionForm').reset();
+        });
+
+        document.getElementById('predictionForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Fetch form data
+        var formData = new FormData(this);
+
+        // Send the form data to the server using Fetch API
+        fetch('/predict', {
+            method: 'POST',
+            body: formData
+        }).then(function(response) {
+            return response.json(); // Parse JSON response
+        }).then(function(data) {
+            if(data.error) {
+                // Handle error
+                document.getElementById('predictionResult').innerText = 'Error: ' + data.error;
+            } else {
+                // Format the number with commas
+                const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+                const formattedValue = numberFormat.format(data.market_value);
+
+                // Display the prediction result and hide the button
+                document.getElementById('predictionResult').innerText = 'Predicted Price: €' + data.market_value.toFixed(2);
+                document.getElementById('predictButton').style.display = 'none';
+            }
+        }).catch(function(error) {
+            // Handle any other errors
+            document.getElementById('predictionResult').innerText = 'Error: ' + error;
+        });
+    });
+    </script>
+</body>
+</html>
